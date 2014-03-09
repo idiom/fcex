@@ -74,10 +74,10 @@ by AV. The file is obfuscated using a simple xor AB.
 
 ##Notes
 
-* There doesn't seem to be any notes on the format that I've been able
-to find, so this is based on my own observactions working with this file
-type. I haven't figured out all of the areas within the fixed portion, I 
-have a few assumptions on what else is contained 
+* There doesn't seem to be any information on the format that I've been able
+to find, so this is based on my own observations working with this file
+type. I haven't figured out all of the areas within the fixed portion, but I 
+have a few assumptions on what else might be contained 
 (Action taken,Checksum, Timezone,...). If you notice any issues or want to collaborate let me know 
 [@seanmw](https://twitter.com/seanmw).
 
