@@ -37,7 +37,8 @@ Display details about a sample.
 
 The quarantine file is a binary file with 2 main areas, the file header
 which contains information about the file and some metadata of when it was
-quarantined and the quarantined file. 
+quarantined and the data portion which contains the obfuscated file that
+was quarantine. 
 
 The header is divided into two sections the first is a fixed length section
 which contains offsets for the variable length section and information 
@@ -71,6 +72,24 @@ by AV. The file is obfuscated using a simple xor AB.
             |                                      |
             |                                      |
             +--------------------------------------+
+
+###Fixed Section
+
+The following describes the offsets within the fixed section of the file.
+
+ * [0:2]  Offset of quarantined file start
+ * [6:8]  Year
+ * [8:10] Month 
+ * [12:14] Day
+ * [14:16] Hour
+ * [16:18] Minute
+ * [36:38] Length of quarantine file name [FL]
+ * [40:42] Length of threat name [TL]
+
+###Variable Section 
+ 
+ * [44:FL] - Name and Path of Quarantined File
+ * [44+FL:44+FL+TL] - Name of threat identified by AV
 
 ##Notes
 
