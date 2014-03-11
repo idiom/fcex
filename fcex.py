@@ -7,6 +7,18 @@ from struct import *
 
 class QuaratineFile:
     
+    #Weekday 0 -- 6
+    #The day of the week, Sunday=0, Monday=1 ... Saturday=6
+    weekdays = {
+        0x0: "Sunday",
+        0x1: "Monday",
+        0x2: "Tuesday",
+        0x3: "Wednesday",
+        0x4: "Thursday",
+        0x5: "Friday",
+        0x6: "Saturday",
+    }
+    
     def __init__(self,qfile):   
         
         self.qfilename  = qfile
@@ -14,7 +26,7 @@ class QuaratineFile:
         self.filestart  = None
         self.year       = None
         self.month      = None
-        #self.tz         = None 
+        self.weekday    = None 
         self.day        = None
         self.hour       = None
         self.minute     = None
@@ -28,16 +40,16 @@ class QuaratineFile:
             raise Exception('Quarantine File does not exist...')
         
         self.rawfile = open(qfile,'rb').read()
-        self.filestart = unpack('<h',self.rawfile[0:2])[0]
+        self.filestart = unpack('<H',self.rawfile[0:2])[0]
         
-        self.year = unpack('<h',self.rawfile[6:8])[0]
-        self.month = unpack('<h',self.rawfile[8:10])[0]
-        #self.tz = unpack('<h',self.rawfile[10:12])[0] #maybe?
-        self.day = unpack('<h',self.rawfile[12:14])[0]
-        self.hour = unpack('<h',self.rawfile[14:16])[0]
-        self.minute = unpack('<h',self.rawfile[16:18])[0]        
-        self.namelen = unpack('<h',self.rawfile[36:38])[0]
-        self.threatlen = unpack('<h',self.rawfile[40:42])[0]
+        self.year = unpack('<H',self.rawfile[6:8])[0]
+        self.month = unpack('<H',self.rawfile[8:10])[0]
+        self.weekday = unpack('<H',self.rawfile[10:12])[0]
+        self.day = unpack('<H',self.rawfile[12:14])[0]
+        self.hour = unpack('<H',self.rawfile[14:16])[0]
+        self.minute = unpack('<H',self.rawfile[16:18])[0]        
+        self.namelen = unpack('<H',self.rawfile[36:38])[0]
+        self.threatlen = unpack('<H',self.rawfile[40:42])[0]
         self.fullname = self.rawfile[44:44+self.namelen]
         self.filename = self.fullname.split('\\')[-1].replace('\0','')
         crsr = 44+self.namelen
@@ -57,14 +69,13 @@ class QuaratineFile:
         qobj = "\n\n"
         qobj += "---- Quarantine File Summary ----\n"
         qobj += "\n"
-        qobj += " Date Quarantined:      %d/%d/%d\n" % (self.day,self.month,self.year)
-        qobj += " Time Quarantined:      %d:%02d\n" % (self.hour,self.minute)
+        qobj += " Date Quarantined:      %s, %d/%d/%d %d:%02d  \n" \
+        % (self.weekdays[self.weekday], self.day,self.month, self.year, self.hour, self.minute)
         qobj += " File Name:             %s\n" % self.fullname 
         qobj += " Threat Name:           %s\n" % self.threatname        
         m = hashlib.sha1() 
         m.update(self.extractfile())
-        qobj += " SHA1:                  %s\n" % m.hexdigest()  
-        
+        qobj += " SHA1 Hash:             %s\n" % m.hexdigest()  
         
         qobj += "\n"
         return qobj

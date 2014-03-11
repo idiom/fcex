@@ -25,11 +25,10 @@ Display details about a sample.
 
     ---- Quarantine File Summary ----
 
-      Date Quarantined:      7/3/2014
-      Time Quarantined:      13:59
+      Date Quarantined:      Sunday, 9/3/2014 20:36  
       File Name:             c:\tools\eicar-sample.txt
       Threat Name:           EICAR_TEST_FILE
-      SHA1:                  3395856ce81f2b7382dee72602f798b642f14140
+      SHA1 Hash:             3395856ce81f2b7382dee72602f798b642f14140
 
 
 
@@ -79,7 +78,8 @@ The following describes the offsets within the fixed section of the file.
 
  * [0:2]  Offset of quarantined file start
  * [6:8]  Year
- * [8:10] Month 
+ * [8:10] Month
+ * [10:12] Weekday 
  * [12:14] Day
  * [14:16] Hour
  * [16:18] Minute
