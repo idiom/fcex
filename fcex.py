@@ -41,7 +41,6 @@ class QuaratineFile:
         
         self.rawfile = open(qfile,'rb').read()
         self.filestart = unpack('<H',self.rawfile[0:2])[0]
-        
         self.year = unpack('<H',self.rawfile[6:8])[0]
         self.month = unpack('<H',self.rawfile[8:10])[0]
         self.weekday = unpack('<H',self.rawfile[10:12])[0]
