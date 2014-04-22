@@ -48,14 +48,6 @@ threat name used by the A/V.
 The last area contains the obfuscated file that was quarantined 
 by AV. The file is obfuscated using a simple xor AB. 
             
-            0               8               16
-            +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+  
-            |   | | | |   |   | | | | | | | |
-            +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-            | | | | | | | | | | | | | | | | |
-            +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-            
-            
             +--------------------------------------+
             |                                      |
             |                                      |
