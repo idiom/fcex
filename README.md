@@ -47,8 +47,15 @@ threat name used by the A/V.
 
 The last area contains the obfuscated file that was quarantined 
 by AV. The file is obfuscated using a simple xor AB. 
-
-
+            
+            0               8               16
+            +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+  
+            |   | | | |   |   | | | | | | | |
+            +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+            | | | | | | | | | | | | | | | | |
+            +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+            
+            
             +--------------------------------------+
             |                                      |
             |                                      |
@@ -76,13 +83,15 @@ by AV. The file is obfuscated using a simple xor AB.
 
 The following describes the offsets within the fixed section of the file.
 
- * [0:2]  Offset of quarantined file start
- * [6:8]  Year
- * [8:10] Month
+ * [0:2]   Offset of quarantined file start
+ * [6:8]   Year
+ * [8:10]  Month
  * [10:12] Weekday 
  * [12:14] Day
  * [14:16] Hour
  * [16:18] Minute
+ * [18:20] Second
+ * [20:22] Millisecond
  * [36:38] Length of quarantine file name [FL]
  * [40:42] Length of threat name [TL]
 

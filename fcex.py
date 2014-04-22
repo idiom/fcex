@@ -30,6 +30,8 @@ class QuaratineFile:
         self.day        = None
         self.hour       = None
         self.minute     = None
+        self.second     = None
+        self.millisec   = None
         self.fullname   = None
         self.filename   = None
         self.namelen    = None
@@ -46,7 +48,9 @@ class QuaratineFile:
         self.weekday = unpack('<H',self.rawfile[10:12])[0]
         self.day = unpack('<H',self.rawfile[12:14])[0]
         self.hour = unpack('<H',self.rawfile[14:16])[0]
-        self.minute = unpack('<H',self.rawfile[16:18])[0]        
+        self.minute = unpack('<H',self.rawfile[16:18])[0]
+        self.second = unpack('<H',self.rawfile[18:20])[0]  
+        self.millisec = unpack('<H',self.rawfile[20:22])[0]          
         self.namelen = unpack('<H',self.rawfile[36:38])[0]
         self.threatlen = unpack('<H',self.rawfile[40:42])[0]
         self.fullname = self.rawfile[44:44+self.namelen]
@@ -68,8 +72,8 @@ class QuaratineFile:
         qobj = "\n\n"
         qobj += "---- Quarantine File Summary ----\n"
         qobj += "\n"
-        qobj += " Date Quarantined:      %s, %d/%d/%d %d:%02d  \n" \
-        % (self.weekdays[self.weekday], self.day,self.month, self.year, self.hour, self.minute)
+        qobj += " Date Quarantined:      %s, %d/%d/%d %d:%02d:%02d.%03d  \n" \
+        % (self.weekdays[self.weekday], self.day,self.month, self.year, self.hour, self.minute,self.second,self.millisec)
         qobj += " File Name:             %s\n" % self.fullname 
         qobj += " Threat Name:           %s\n" % self.threatname        
         m = hashlib.sha1() 
