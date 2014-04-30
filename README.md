@@ -87,10 +87,12 @@ The following describes the offsets within the fixed section of the file.
  * [36:38] Length of quarantine file name [FL]
  * [40:42] Length of threat name [TL]
 
+
 ###Variable Section 
  
  * [44:FL] - Name and Path of Quarantined File
  * [44+FL:44+FL+TL] - Name of threat identified by AV
+
 
 ##Notes
 
