@@ -1,14 +1,29 @@
 #!/usr/bin/env python
 
+__description__ = 'Extract FortiClient Quarantine File'
+__author__ = 'Sean Wilson'
+__version__ = '0.0.2'
+
+'''
+ --- History ---
+ 3.9.2014  - Initial Release
+ 2.24.2015 - Updated Field parsing
+
+
+'''
+
 import argparse 
 import hashlib
 import os.path
-from struct import * 
+from struct import *
+from datetime import datetime
+
+
 
 class QuaratineFile:
     
-    #Weekday 0 -- 6
-    #The day of the week, Sunday=0, Monday=1 ... Saturday=6
+    # Weekday 0 -- 6
+    # The day of the week, Sunday=0, Monday=1 ... Saturday=6
     weekdays = {
         0x0: "Sunday",
         0x1: "Monday",
@@ -19,7 +34,7 @@ class QuaratineFile:
         0x6: "Saturday",
     }
     
-    def __init__(self,qfile):   
+    def __init__(self, qfile):
         
         self.qfilename  = qfile
         self.rawfile    = None
@@ -41,30 +56,45 @@ class QuaratineFile:
         if not os.path.isfile(qfile):
             raise Exception('Quarantine File does not exist...')
         
-        self.rawfile = open(qfile,'rb').read()
-        self.filestart = unpack('<H',self.rawfile[0:2])[0]
-        self.year = unpack('<H',self.rawfile[6:8])[0]
-        self.month = unpack('<H',self.rawfile[8:10])[0]
-        self.weekday = unpack('<H',self.rawfile[10:12])[0]
-        self.day = unpack('<H',self.rawfile[12:14])[0]
-        self.hour = unpack('<H',self.rawfile[14:16])[0]
-        self.minute = unpack('<H',self.rawfile[16:18])[0]
-        self.second = unpack('<H',self.rawfile[18:20])[0]  
-        self.millisec = unpack('<H',self.rawfile[20:22])[0]          
-        self.namelen = unpack('<H',self.rawfile[36:38])[0]
-        self.threatlen = unpack('<H',self.rawfile[40:42])[0]
+        self.rawfile = open(qfile, 'rb').read()
+        self.filestart = unpack('<I', self.rawfile[0:4])[0]
+        self.year = unpack('<H', self.rawfile[6:8])[0]
+        self.month = unpack('<H', self.rawfile[8:10])[0]
+        self.weekday = unpack('<H', self.rawfile[10:12])[0]
+        self.day = unpack('<H', self.rawfile[12:14])[0]
+        self.hour = unpack('<H', self.rawfile[14:16])[0]
+        self.minute = unpack('<H', self.rawfile[16:18])[0]
+        self.second = unpack('<H', self.rawfile[18:20])[0]
+        self.millisec = unpack('<I', self.rawfile[20:24])[0]
+        self.date = datetime(self.year, self.month, self.day, self.hour, self.minute, self.second, self.millisec)
+        self.namelen = unpack('<I', self.rawfile[36:40])[0]
+        self.threatlen = unpack('<I', self.rawfile[40:44])[0]
         self.fullname = self.rawfile[44:44+self.namelen]
-        self.filename = self.fullname.split('\\')[-1].replace('\0','')
+        self.filename = self.fullname.split('\\')[-1].replace('\0', '')
         crsr = 44+self.namelen
         self.threatname = self.rawfile[crsr:crsr+self.threatlen]
 
-            
+
+    def calchash(self, htype):
+        fdat = self.extractfile()
+        if htype == 'md5':
+            m = hashlib.md5()
+        elif htype == 'sha1':
+            m = hashlib.sha1()
+        elif htype == 'sha256':
+            m = hashlib.sha256()
+        m.update(fdat)
+        return m.hexdigest()
+
+
+
+
     def extractfile(self, decrypt=True):
         
         data = bytearray(self.rawfile[self.filestart:])
         if not decrypt:
             return data
-        for x in range(0,len(data)):
+        for x in range(0, len(data)):
             data[x] ^= 0xAB        
         return data
         
@@ -72,13 +102,12 @@ class QuaratineFile:
         qobj = "\n\n"
         qobj += "---- Quarantine File Summary ----\n"
         qobj += "\n"
-        qobj += " Date Quarantined:      %s, %d/%d/%d %d:%02d:%02d.%03d  \n" \
-        % (self.weekdays[self.weekday], self.day,self.month, self.year, self.hour, self.minute,self.second,self.millisec)
-        qobj += " File Name:             %s\n" % self.fullname 
-        qobj += " Threat Name:           %s\n" % self.threatname        
-        m = hashlib.sha1() 
-        m.update(self.extractfile())
-        qobj += " SHA1 Hash:             %s\n" % m.hexdigest()  
+        qobj += " Date Quarantined:   %s\n" % self.date
+        qobj += " File Name:          %s\n" % self.fullname
+        qobj += " Threat Name:        %s\n" % self.threatname
+        qobj += " MD5 Hash:           %s\n" % self.calchash('md5')
+        qobj += " SHA1 Hash:          %s\n" % self.calchash('sha1')
+        qobj += " SHA256 Hash:        %s\n" % self.calchash('sha256')
         
         qobj += "\n"
         return qobj
@@ -86,8 +115,8 @@ class QuaratineFile:
 def main():
     parser = argparse.ArgumentParser(description="This script can be used to extract data from a FortiClient quarantine file.")
     parser.add_argument("qfile", help="The file that you wish to extract the sample from.")    
-    parser.add_argument('-d','--details',dest='details',action='store_true',help="Print the Quarantine Details ")
-    parser.add_argument('-o','--orgname', dest='orgname',action='store_true',help="Write file using original name.")
+    parser.add_argument('-d', '--details', dest='details', action='store_true', help="Print the Quarantine Details ")
+    parser.add_argument('-o', '--orgname', dest='orgname', action='store_true', help="Write file using original name.")
 
     args = parser.parse_args()
     
@@ -100,7 +129,7 @@ def main():
         fname = 'sample.bin'
         if args.orgname:
             fname = q.filename
-        outf = open(fname,'wb')
+        outf = open(fname, 'wb')
         outf.write(filedata) 
         outf.close()
     

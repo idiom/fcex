@@ -34,16 +34,16 @@ Display details about a sample.
 
 ##File Format
 
-The quarantine file is a binary file with 2 main areas, the file header
-which contains information about the file and some metadata of when it was
-quarantined and the data portion which contains the obfuscated file that
+The quarantine file is a binary file with 2 areas; a header
+which contains information about the quarantine file and some metadata of when it was
+quarantined and a data portion which contains the obfuscated file that
 was quarantine. 
 
-The header is divided into two sections the first is a fixed length section
+The header is divided into two sections, the first is a fixed length section
 which contains offsets for the variable length section and information 
 such as time/date of when the item was quarantined. The variable length
 section contains the name and filepath of the quarantined file and the 
-threat name used by the A/V.
+threat name used by FortiClient A/V.
 
 The last area contains the obfuscated file that was quarantined 
 by AV. The file is obfuscated using a simple xor AB. 
@@ -73,9 +73,9 @@ by AV. The file is obfuscated using a simple xor AB.
 
 ###Fixed Section
 
-The following describes the offsets within the fixed section of the file.
+The following outlines the offsets within the fixed section of the file.
 
- * [0:2]   Offset of quarantined file start
+ * [0:4]   Offset of quarantined file start
  * [6:8]   Year
  * [8:10]  Month
  * [10:12] Weekday 
@@ -83,9 +83,9 @@ The following describes the offsets within the fixed section of the file.
  * [14:16] Hour
  * [16:18] Minute
  * [18:20] Second
- * [20:22] Millisecond
- * [36:38] Length of quarantine file name [FL]
- * [40:42] Length of threat name [TL]
+ * [20:24] Millisecond
+ * [36:40] Length of quarantine file name [FL]
+ * [40:44] Length of threat name [TL]
 
 
 ###Variable Section 
@@ -100,6 +100,8 @@ The following describes the offsets within the fixed section of the file.
 to find, so this is based on my own observations working with this file
 type. I haven't figured out all of the areas within the fixed portion, but I 
 have a few assumptions on what else might be contained 
-(Action taken,Checksum, Timezone,...). If you notice any issues or want to collaborate let me know 
+(Action taken,Checksum, Timezone,...). 
+
+If you notice any issues or want to collaborate let me know 
 [@seanmw](https://twitter.com/seanmw).
 
