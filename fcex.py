@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-__description__ = 'Extract FortiClient Quarantine File'
+__description__ = 'Library to work with FortiClient Quarantine Files'
 __author__ = 'Sean Wilson'
 __version__ = '0.0.2'
 
@@ -8,7 +8,7 @@ __version__ = '0.0.2'
  --- History ---
  3.9.2014  - Initial Release
  2.24.2015 - Updated Field parsing
-
+ 4.29.2015 - Added Setup.py
 
 '''
 
@@ -19,8 +19,7 @@ from struct import *
 from datetime import datetime
 
 
-
-class QuaratineFile:
+class FCQuaratineFile:
     
     # Weekday 0 -- 6
     # The day of the week, Sunday=0, Monday=1 ... Saturday=6
@@ -36,22 +35,7 @@ class QuaratineFile:
     
     def __init__(self, qfile):
         
-        self.qfilename  = qfile
-        self.rawfile    = None
-        self.filestart  = None
-        self.year       = None
-        self.month      = None
-        self.weekday    = None 
-        self.day        = None
-        self.hour       = None
-        self.minute     = None
-        self.second     = None
-        self.millisec   = None
-        self.fullname   = None
-        self.filename   = None
-        self.namelen    = None
-        self.threatlen  = None
-        self.threatname = None
+        self.qfilename = qfile
         
         if not os.path.isfile(qfile):
             raise Exception('Quarantine File does not exist...')
@@ -74,7 +58,6 @@ class QuaratineFile:
         crsr = 44+self.namelen
         self.threatname = self.rawfile[crsr:crsr+self.threatlen]
 
-
     def calchash(self, htype):
         fdat = self.extractfile()
         if htype == 'md5':
@@ -85,9 +68,6 @@ class QuaratineFile:
             m = hashlib.sha256()
         m.update(fdat)
         return m.hexdigest()
-
-
-
 
     def extractfile(self, decrypt=True):
         
@@ -113,26 +93,28 @@ class QuaratineFile:
         return qobj
 
 def main():
-    parser = argparse.ArgumentParser(description="This script can be used to extract data from a FortiClient quarantine file.")
+    parser = argparse.ArgumentParser(description="Python Library to work with FortiClient Quarantine Files.")
     parser.add_argument("qfile", help="The file that you wish to extract the sample from.")    
     parser.add_argument('-d', '--details', dest='details', action='store_true', help="Print the Quarantine Details ")
     parser.add_argument('-o', '--orgname', dest='orgname', action='store_true', help="Write file using original name.")
 
     args = parser.parse_args()
     
-    q = QuaratineFile(args.qfile)
+    q = FCQuaratineFile(args.qfile)
     
     if args.details:
         print q
     else:
         filedata = q.extractfile()
-        fname = 'sample.bin'
+
         if args.orgname:
             fname = q.filename
+        else:
+            fname = q.calchash('md5')
+
         outf = open(fname, 'wb')
         outf.write(filedata) 
         outf.close()
-    
     return 0
 
 if __name__ == '__main__':
