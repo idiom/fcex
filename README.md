@@ -1,9 +1,8 @@
 #fcex#
 
-fcex is a python script that allows you to work with FortiClient quarantine files. 
-
+Python script for working with FortiClient quarantine files. The script supports extracting the quarantined file and optionally displaying the quarantine metadata.
+ 
 #Usage#
-
 
     usage: fcex.py [-h] [-d] [-o] qfile
 
